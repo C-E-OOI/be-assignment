@@ -1,40 +1,52 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { IAccountManagerRepository } from "../account-manager.repository";
-import { DefaultArgs } from "@prisma/client/runtime/library";
-import { hash } from "bun";
-import { TInsert } from "@/AccountManager/constant/account-manager.type";
+import { TInsert, TRepositoryPrisma } from "@/AccountManager/constant/account-manager.type";
+import bcrypt from "bcrypt";
+import { SALT_ROUND } from "@/AccountManager/constant/account-manager.constant";
 
 export class AccountManagerRepository implements IAccountManagerRepository {
-  private _prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
-  private _hash;
-  constructor(prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>) {
+  private _TAG;
+  private _prisma: TRepositoryPrisma;
+  private _bcrypt;
+  constructor(prisma: TRepositoryPrisma) {
+    this._TAG = "AccountManagerRepository";
     this._prisma = prisma;
-    this._hash = hash;
+    this._bcrypt = bcrypt;
   }
 
   async insert(DTO: TInsert): Promise<any> {
-    const user = await this._prisma.user.create({
-      data: {
-        name: DTO.name,
-        role: DTO.role,
-        email: DTO.email,
-        password: this._hash(DTO.password).toString(),
-      },
-    });
-    return user;
+    try {
+      const hashedPassword = await this._bcrypt.hash(DTO.password, SALT_ROUND);
+      const user = await this._prisma.user.create({
+        data: {
+          name: DTO.name,
+          role: DTO.role,
+          email: DTO.email,
+          password: hashedPassword,
+        },
+      });
+      return user;
+    } catch (error: any) {
+      console.error(`${this._TAG} Got Error at func: insert(): ${error.message}`);
+      throw new Error(`${this._TAG} Got Error at func: insert(): ${error.message}`);
+    }
   }
 
   async find(email: string): Promise<any> {
-    const user = await this._prisma.user.findUnique({
-      where: { email: email },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        password: true,
-      },
-    });
-    return user;
+    try {
+      const user = await this._prisma.user.findUnique({
+        where: { email: email },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          password: true,
+        },
+      });
+      return user;
+    } catch (error: any) {
+      console.error(`${this._TAG} Got Error at func: find(): ${error.message}`);
+      throw new Error(`${this._TAG} Got Error at func: find(): ${error.message}`);
+    }
   }
 }

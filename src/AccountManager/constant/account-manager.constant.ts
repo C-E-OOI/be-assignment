@@ -1,5 +1,6 @@
 export const INVALID_INPUT = "invalid input";
 export const NOT_FOUND = "Not Found";
+export const SALT_ROUND = 10;
 
 export enum statusCode {
   OK = 200,
