@@ -9,7 +9,8 @@
   "dependencies": {
     "@prisma/client": "5.13.0",
     "bcrypt": "^5.1.1",
-    "elysia": "latest"
+    "elysia": "latest",
+    "supertokens-node": "^17.1.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

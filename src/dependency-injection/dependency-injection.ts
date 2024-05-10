@@ -4,9 +4,7 @@ import { AccountManagerService } from "@/AccountManager/domain/account-manager.s
 import { AccountManagerQuery } from "@/AccountManager/application/query/account-manager.query";
 import { AccountManagerCommand } from "@/AccountManager/application/command/account-manager.command";
 
-const getPrismaConnection = prismaConnection();
-
-const repository = new AccountManagerRepository(getPrismaConnection);
+const repository = new AccountManagerRepository(prismaConnection());
 const service = new AccountManagerService(repository);
 export const query = new AccountManagerQuery(service);
 export const command = new AccountManagerCommand(service);
