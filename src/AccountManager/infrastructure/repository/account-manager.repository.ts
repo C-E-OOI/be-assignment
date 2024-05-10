@@ -1,4 +1,6 @@
+import { TInsert } from "@/AccountManager/constant/account-manager.type";
+
 export interface IAccountManagerRepository {
-  insert(name: string, role: string, email: string, password: string): Promise<string>;
+  insert(DTO: TInsert): Promise<string>;
   find(email: string): Promise<string>;
 }

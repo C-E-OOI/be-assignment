@@ -1,3 +1,4 @@
+import { TInsert } from "../constant/account-manager.type";
 import { IAccountManagerRepository } from "../infrastructure/repository/account-manager.repository";
 import { IAccountManagerService } from "./account-manager.abstraction";
 
@@ -7,8 +8,8 @@ export class AccountManagerService implements IAccountManagerService {
     this._repository = repository;
   }
 
-  async add(name: string, role: string, email: string, password: string): Promise<any> {
-    return await this._repository.insert(name, role, email, password);
+  async add(DTO: TInsert): Promise<any> {
+    return await this._repository.insert(DTO);
   }
 
   async get(email: string): Promise<any> {

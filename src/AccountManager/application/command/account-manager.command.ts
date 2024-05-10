@@ -1,5 +1,6 @@
 import { IAccountManagerService } from "@/AccountManager/domain/account-manager.abstraction";
 import { IAccountManagerCommand } from "./account-manager.abstraction";
+import { TInsert } from "@/AccountManager/constant/account-manager.type";
 
 export class AccountManagerCommand implements IAccountManagerCommand {
   private _service;
@@ -7,8 +8,8 @@ export class AccountManagerCommand implements IAccountManagerCommand {
     this._service = edtechService;
   }
 
-  async signup(name: string, role: string, email: string, password: string): Promise<string> {
-    const user = await this._service.add(name, role, email, password);
+  async signup(DTO: TInsert): Promise<string> {
+    const user = await this._service.add(DTO);
     return `Welcome ${user.name} please login with this email: ${user.email}`;
   }
 }

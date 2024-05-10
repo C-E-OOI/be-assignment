@@ -1,7 +1,8 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { IAccountManagerRepository } from "../account-manager.repository";
-import { SHA256 as hash } from "crypto-js";
 import { DefaultArgs } from "@prisma/client/runtime/library";
+import { hash } from "bun";
+import { TInsert } from "@/AccountManager/constant/account-manager.type";
 
 export class AccountManagerRepository implements IAccountManagerRepository {
   private _prisma: PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
@@ -11,9 +12,14 @@ export class AccountManagerRepository implements IAccountManagerRepository {
     this._hash = hash;
   }
 
-  async insert(name: string, role: string, email: string, password: string): Promise<any> {
+  async insert(DTO: TInsert): Promise<any> {
     const user = await this._prisma.user.create({
-      data: { name: name, role: role, email: email, password: this._hash(password).toString() },
+      data: {
+        name: DTO.name,
+        role: DTO.role,
+        email: DTO.email,
+        password: this._hash(DTO.password).toString(),
+      },
     });
     return user;
   }

@@ -1,4 +1,6 @@
+import { TInsert } from "../constant/account-manager.type";
+
 export interface IAccountManagerService {
-  add(name: string, role: string, email: string, password: string): Promise<Record<string, string>>;
+  add(DTO: TInsert): Promise<Record<string, string>>;
   get(email: string): Promise<any>;
 }
