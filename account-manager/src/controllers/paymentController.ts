@@ -1,12 +1,10 @@
 import { Response } from 'express';
 import { STATUS } from '../constants/status';
 import { paymentService } from '../services/paymentService';
-import { IGetUserAuthInfoRequest } from 'src/types/express';
-
 
 
 export const paymentController = {
-  createPaymentAccount: async (req: IGetUserAuthInfoRequest, res: Response) => {
+  createPaymentAccount: async (req: any, res: Response) => {
     try {
       const userId = req.user.user.id;
       const { account_type, account_number, balance = 0 } = req.body;
@@ -24,7 +22,7 @@ export const paymentController = {
     }
   },
 
-  getAllPaymentAccounts: async (req: IGetUserAuthInfoRequest, res: Response) => {
+  getAllPaymentAccounts: async (req: any, res: Response) => {
     try {
       const userId = req.user.user.id;
       const paymentAccounts = await paymentService.getAllPaymentAccountsByUserId(userId);
@@ -36,7 +34,7 @@ export const paymentController = {
     }
   },
 
-  getPaymentAccountById: async (req: IGetUserAuthInfoRequest, res: Response) => {
+  getPaymentAccountById: async (req: any, res: Response) => {
     try {
       const userId = req.user.user.id;
       const id  = +req.params.id as number
@@ -53,7 +51,7 @@ export const paymentController = {
     }
   },
 
-  getPaymentHistoryByAccountId: async (req: IGetUserAuthInfoRequest, res: Response) => {
+  getPaymentHistoryByAccountId: async (req: any, res: Response) => {
     try {
       const userId = req.user.user.id;
       const id  = +req.params.id as number

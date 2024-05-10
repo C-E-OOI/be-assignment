@@ -6,13 +6,14 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/src/index.js",
-    "dev": "nodemon bin/www"
+    "dev": "nodemon bin/www",
+    "generate": "prisma generate"
   },
   "keywords": [],
+  "author": "",
   "prisma": {
     "schema": "./prisma/schema.prisma"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.13.0",

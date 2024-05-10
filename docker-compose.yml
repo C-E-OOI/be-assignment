@@ -1,0 +1,43 @@
+version : '3'
+services:
+
+  account-manager:
+    build:
+      context: .
+      dockerfile: ./account-manager/Dockerfile
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      ANON_KEY: ${ANON_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db
+    volumes:
+      - ./prisma:/prisma
+    ports:
+      - "3000:3000"
+
+  payment-manager:
+    build:
+      context: .
+      dockerfile: ./payment-manager/Dockerfile
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      ANON_KEY: ${ANON_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db
+    volumes:
+      - ./prisma:/prisma
+    ports:
+      - "3001:3001"
+      
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    
+volumes:
+  db-data:
