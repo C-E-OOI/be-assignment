@@ -31,10 +31,24 @@ model Transaction {
   amount        Float
   status        String
   toAddress     String
+  historyId String
+  history   PaymentHistory  @relation(fields: [historyId], references: [id])
   timestamp     DateTime    @default(now())
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
   @@map("transactions")
+}
+
+
+// Payment History: Records of transactions
+model PaymentHistory {
+  id            String      @id @default(uuid())
+  accountId     String
+  account       PaymentAccount @relation(fields: [accountId], references: [id])
+  transactions  Transaction[]
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  @@map("payment_historys")
 }
 
 // Payment Account: One user can have multiple accounts like credit, debit, loan...
@@ -49,19 +63,5 @@ model PaymentAccount {
   createdAt       DateTime    @default(now())
 
   @@map("payment_accounts")
-}
-
-// Payment History: Records of transactions
-model PaymentHistory {
-  id            String      @id @default(uuid())
-  accountId     String
-  account       PaymentAccount @relation(fields: [accountId], references: [id])
-  amount        Float
-  status        String
-  toAddress     String
-  timestamp     DateTime    @default(now())
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
-  @@map("payment_historys")
 }
 
