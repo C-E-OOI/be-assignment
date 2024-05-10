@@ -1,9 +1,9 @@
-import { EdtechServiceInterface } from "@/AccountManager/domain/account-manager.abstraction";
-import { AccountManagerCommandInterface } from "./account-manager.abstraction";
+import { IAccountManagerService } from "@/AccountManager/domain/account-manager.abstraction";
+import { IAccountManagerCommand } from "./account-manager.abstraction";
 
-export class AccountManagerCommand implements AccountManagerCommandInterface {
+export class AccountManagerCommand implements IAccountManagerCommand {
   private _service;
-  constructor(edtechService: EdtechServiceInterface) {
+  constructor(edtechService: IAccountManagerService) {
     this._service = edtechService;
   }
 

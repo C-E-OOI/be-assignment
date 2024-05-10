@@ -1,12 +1,12 @@
-import { EdtechMysqlRepository } from "@/core/infrastructure/repository/mysql/edtech.mysql";
+import { AccountManagerRepository } from "@/AccountManager/infrastructure/repository/psql/account-manager.mysql";
 import { prismaConnection } from "./dependency-injection.init";
-import { EdtechService } from "@/core/domain/edtech.service";
-import { EdtechQuery } from "@/core/application/query/edtech.query";
-import { EdtechCommand } from "@/core/application/command/edtech.command";
+import { AccountManagerService } from "@/AccountManager/domain/account-manager.service";
+import { AccountManagerQuery } from "@/AccountManager/application/query/account-manager.query";
+import { AccountManagerCommand } from "@/AccountManager/application/command/account-manager.command";
 
 const getPrismaConnection = prismaConnection();
 
-const repository = new EdtechMysqlRepository(getPrismaConnection);
-const service = new EdtechService(repository);
-export const query = new EdtechQuery(service);
-export const command = new EdtechCommand(service);
+const repository = new AccountManagerRepository(getPrismaConnection);
+const service = new AccountManagerService(repository);
+export const query = new AccountManagerQuery(service);
+export const command = new AccountManagerCommand(service);

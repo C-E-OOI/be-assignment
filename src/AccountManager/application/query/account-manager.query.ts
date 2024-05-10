@@ -1,28 +1,11 @@
-import { EdtechServiceInterface } from "@/AccountManager/domain/account-manager.abstraction";
-import { EdtechQueryInterface } from "./account-manager.abstraction";
+import { IAccountManagerService } from "@/AccountManager/domain/account-manager.abstraction";
 import { INVALID_INPUT, NOT_FOUND } from "@/AccountManager/constant/account-manager.constant";
-// import { INVALID_INPUT, NOT_FOUND } from "@/core/constant/edtech.constant";
+import { IAccountManagerQuery } from "./account-manager.abstraction";
 
-export class EdtechQuery implements EdtechQueryInterface {
+export class AccountManagerQuery implements IAccountManagerQuery {
   private _service;
-  constructor(edtechService: EdtechServiceInterface) {
+  constructor(edtechService: IAccountManagerService) {
     this._service = edtechService;
-  }
-  async list(): Promise<string[]> {
-    return await this._service.list();
-  }
-
-  async get(userId: string): Promise<string> {
-    const user = await this._service.get(userId);
-    if (!user) {
-      return "User not found.";
-    }
-
-    if (user.role != "user") {
-      return "Bad Request Auth";
-    }
-
-    return await this._service.get(user.userId);
   }
 
   async signin(email: string, password: string): Promise<any> {
@@ -40,10 +23,5 @@ export class EdtechQuery implements EdtechQueryInterface {
       email: user.email,
       role: user.role,
     };
-  }
-
-  async downloadMateri(userId: string, filePath: string): Promise<string> {
-    const materi = await this.get(userId);
-    return materi;
   }
 }
