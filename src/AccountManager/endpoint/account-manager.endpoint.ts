@@ -1,4 +1,4 @@
-import Elysia from "elysia";
+import Elysia, { t } from "elysia";
 import { IAccountManagerCommand } from "../application/command/account-manager.abstraction";
 import { IAccountManagerQuery } from "../application/query/account-manager.abstraction";
 import { IAccountManagerEndpoint } from "./account-manager.abstraction";
@@ -8,18 +8,30 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   private _TAG: string;
   private _query: IAccountManagerQuery;
   private _command: IAccountManagerCommand;
-  private _router: Elysia;
-  constructor(query: IAccountManagerQuery, command: IAccountManagerCommand, router: Elysia) {
+  private _router: Elysia<"/auth">;
+  constructor(query: IAccountManagerQuery, command: IAccountManagerCommand, router: Elysia<"/auth">) {
     this._query = query;
     this._command = command;
     this._router = router;
     this._TAG = "AccountManagerEndpoint";
   }
 
-  registerRoute(): void {
+  async registerRoute(): Promise<any> {
     this._router
-      .get("/signin", async ({ body }: { body: Body }) => await this.signin(body))
-      .post("/signup", async ({ body }: { body: Body }) => await this.signup(body));
+      .get("/signin", async ({ body }: { body: Body }) => await this.signin(body), {
+        body: t.Object({
+          email: t.String({ minLength: 10, maxLength: 50 }),
+          password: t.String({ minLength: 8, maxLength: 32 }),
+        }),
+      })
+      .post("/signup", async ({ body }: { body: Body }) => await this.signup(body), {
+        body: t.Object({
+          username: t.String({ minLength: 10, maxLength: 50 }),
+          role: t.String({ minLength: 5, maxLength: 10 }),
+          email: t.String({ minLength: 10, maxLength: 50 }),
+          password: t.String({ minLength: 8, maxLength: 32 }),
+        }),
+      });
   }
 
   async signin(req: Body): Promise<TSigninRes | undefined> {
@@ -35,11 +47,11 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
 
   async signup(req: Body): Promise<string | undefined> {
     try {
-      const { name, email, role, password } = req.body as any;
+      const { name, role, email, password } = req.body as any;
       const dto: TInsert = {
         name: name,
-        email: email,
         role: role,
+        email: email,
         password: password,
       };
       const dataRes = await this._command.signup(dto);

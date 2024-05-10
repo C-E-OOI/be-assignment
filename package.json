@@ -4,9 +4,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "bun run --watch src/index.ts",
+    "debug": "bun --inspect src/index.ts",
     "migrate": "prisma migrate dev --name be-assignment"
   },
   "dependencies": {
+    "@elysiajs/swagger": "^1.0.5",
     "@prisma/client": "5.13.0",
     "bcrypt": "^5.1.1",
     "elysia": "latest",
