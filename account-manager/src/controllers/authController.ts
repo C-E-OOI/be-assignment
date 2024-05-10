@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { STATUS } from "../../constants/status";
+import { STATUS } from "../constants/status";
 import { supabase } from "../config/supabase";
 import { LoginRequest } from "../types";
 

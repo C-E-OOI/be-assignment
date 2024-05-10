@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const status_1 = require("../../constants/status");
+const status_1 = require("../constants/status");
 const supabase_1 = require("../config/supabase");
 class AuthController {
     static login(req, res) {
