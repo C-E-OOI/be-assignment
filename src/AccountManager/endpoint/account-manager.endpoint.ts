@@ -1,41 +1,90 @@
 import Elysia, { Cookie, t } from "elysia";
-import { IAccountManagerCommand } from "../application/command/account-manager.interface";
+import { IAccountManagerCommand } from "../application/command/account-manager.abstraction";
 import { IAccountManagerQuery } from "../application/query/account-manager.interface";
 import { IAccountManagerEndpoint, IJWT } from "./account-manager.interface";
 import { TCustomSetElysia, TInsert, TReqSignin, TReqSignup, TSigninRes, TSignupRes } from "../constant/account-manager.type";
 import { STATUS_CODE } from "../constant/account-manager.constant";
-import jwt, { JWTPayloadSpec } from "@elysiajs/jwt";
+import { JWTPayloadSpec } from "@elysiajs/jwt";
 
 export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   private _TAG: string;
   private _query: IAccountManagerQuery;
   private _command: IAccountManagerCommand;
   private _router: Elysia<"/auth">;
-  constructor(query: IAccountManagerQuery, command: IAccountManagerCommand, router: Elysia<"/auth">) {
+  private _basicAuthModel;
+  private _jwtAccessSetup;
+  private _jwtRefreshSetup;
+
+  constructor(
+    query: IAccountManagerQuery,
+    command: IAccountManagerCommand,
+    router: Elysia<"/auth">,
+    basicAuthModel: Elysia<
+      "",
+      false,
+      { decorator: {}; store: {}; derive: {}; resolve: {} },
+      { type: { readonly basicAuthModel: { email: string; password: string } }; error: {} },
+      { schema: {}; macro: {} },
+      {},
+      { derive: {}; resolve: {}; schema: {} },
+      { derive: {}; resolve: {}; schema: {} }
+    >,
+    jwtAccessSetup: Elysia<
+      "",
+      false,
+      {
+        decorator: {
+          jwtAccess: {
+            readonly sign: (morePayload: { id: string } & JWTPayloadSpec) => Promise<string>;
+            readonly verify: (jwt?: string | undefined) => Promise<false | ({ id: string } & JWTPayloadSpec)>;
+          };
+        };
+        store: {};
+        derive: {};
+        resolve: {};
+      },
+      { type: {}; error: {} },
+      { schema: {}; macro: {} },
+      {},
+      { derive: {}; resolve: {}; schema: {} },
+      { derive: {}; resolve: {}; schema: {}; decorator: {}; store: {} }
+    >,
+    jwtRefreshSetup: Elysia<
+      "",
+      false,
+      {
+        decorator: {
+          jwtRefresh: {
+            readonly sign: (morePayload: { id: string } & JWTPayloadSpec) => Promise<string>;
+            readonly verify: (jwt?: string | undefined) => Promise<false | ({ id: string } & JWTPayloadSpec)>;
+          };
+        };
+        store: {};
+        derive: {};
+        resolve: {};
+      },
+      { type: {}; error: {} },
+      { schema: {}; macro: {} },
+      {},
+      { derive: {}; resolve: {}; schema: {} },
+      { derive: {}; resolve: {}; schema: {}; decorator: {}; store: {} }
+    >
+  ) {
     this._query = query;
     this._command = command;
     this._router = router;
     this._TAG = "AccountManagerEndpoint";
+    this._basicAuthModel = basicAuthModel;
+    this._jwtAccessSetup = jwtAccessSetup;
+    this._jwtRefreshSetup = jwtRefreshSetup;
   }
 
   registerRoute(): any {
     return this._router
-      .use(
-        jwt({
-          name: "jwt",
-          secret: "Fischl von Luftschloss Narfidort",
-        })
-      )
-      .get("/sign/:name", async ({ jwt, cookie: { auth }, params }) => {
-        auth.set({
-          value: await jwt.sign(params),
-          httpOnly: true,
-          maxAge: 7 * 86400,
-          path: "/profile",
-        });
+      .use(this._basicAuthModel)
+      .use(this._jwtAccessSetup)
+      .use(this._jwtRefreshSetup)
 
-        return `Sign in as ${auth.value}`;
-      })
       .post(
         "/signin",
         async ({
@@ -48,10 +97,7 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
           body: TReqSignin;
         }) => await this.signin(jwt, auth, body),
         {
-          body: t.Object({
-            email: t.String({ minLength: 10, maxLength: 100 }),
-            password: t.String({ minLength: 8, maxLength: 80 }),
-          }),
+          body: "basicAuthModel",
           afterHandle({ response, set }: { response: TSigninRes | any; set: TCustomSetElysia }) {
             if (response.statusCode === 200) {
               console.log(response);

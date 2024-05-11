@@ -14,25 +14,36 @@ datasource db {
 }
 
 model User {
-  id                String      @id @default(uuid())
+  id                Int     @id @default(autoincrement())
   name              String
   email             String?     @unique
   password          String
   role              String      @default("user")
+  refreshTokens   RefreshToken[]
   paymentAccounts   PaymentAccount[] 
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt @map("updated_at")
   @@map("users")
 }
 
+model RefreshToken {
+  id          String   @id @unique @default(uuid())
+  hashedToken String
+  userId      Int
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
 
 model Transaction {
-  id            String      @id @default(uuid())
+  id            Int     @id @default(autoincrement())
+  transactionId String  @unique @default(uuid())
   amount        Float
   status        String
   toAddress     String
-  historyId String
-  history   PaymentHistory  @relation(fields: [historyId], references: [id])
+  historyId     Int
+  history       PaymentHistory  @relation(fields: [historyId], references: [id])
   timestamp     DateTime    @default(now())
   createdAt     DateTime    @default(now()) @map("created_at")
   updatedAt     DateTime    @updatedAt @map("updated_at")
@@ -42,8 +53,9 @@ model Transaction {
 
 // Payment History: Records of transactions
 model PaymentHistory {
-  id            String      @id @default(uuid())
-  accountId     String
+  id            Int     @id @default(autoincrement())
+  historyId     String  @unique @default(uuid())
+  accountId     Int
   account       PaymentAccount @relation(fields: [accountId], references: [id])
   transactions  Transaction[]
   createdAt     DateTime    @default(now()) @map("created_at")
@@ -53,10 +65,12 @@ model PaymentHistory {
 
 // Payment Account: One user can have multiple accounts like credit, debit, loan...
 model PaymentAccount {
-  id              String      @id @default(uuid())
+  id              Int     @id @default(autoincrement())
+  accountId       String  @unique @default(uuid())
   type            String      // e.g., credit, debit, loan
+  paymentNumber   String    
   balance         Float       @default(0)
-  userId          String
+  userId          Int
   user            User        @relation(fields: [userId], references: [id])
   paymentHistory  PaymentHistory[]
   updatedAt       DateTime    @updatedAt
