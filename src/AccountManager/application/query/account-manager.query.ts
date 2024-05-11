@@ -28,7 +28,6 @@ export class AccountManagerQuery implements IAccountManagerQuery {
     }
 
     return {
-      token: Math.random().toString(36),
       email: user.email,
       role: user.role,
     };

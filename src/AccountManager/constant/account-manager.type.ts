@@ -6,8 +6,8 @@ import { ElysiaCookie } from "elysia/dist/cookies";
 export type TInsert = { name: string; role: string; email: string; password: string };
 export type TRepositoryPrisma = PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>;
 
-export type TSigninRes = { statusCode: number; message: { token: string; email: string } };
-export type TSigninResDb = { token: string; email: string };
+export type TSigninRes = { statusCode: number; token: string; message: { email: string; role: string } };
+export type TSigninResDb = { email: string; role: string };
 export type TSignupRes = { statusCode: number; message: string };
 
 export type TReqSignin = { email: string; password: string };

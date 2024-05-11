@@ -55,7 +55,7 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
           afterHandle({ response, set }: { response: TSigninRes | any; set: TCustomSetElysia }) {
             if (response.statusCode === 200) {
               console.log(response);
-              set.cookie = { token: { value: response.message.token } };
+              set.cookie = { token: { value: response.token } };
               set.status = response.statusCode;
               return response.message;
             }
@@ -84,17 +84,16 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       const dataRes = await this._query.signin(email, password);
       console.info(`${this._TAG} dataRes: ${JSON.stringify(dataRes)}`);
 
-      const a = auth.set({
+      auth.set({
         value: await jwt.sign(req),
         httpOnly: true,
-        maxAge: 7 * 86400,
-        path: "/transaction",
+        maxAge: 1 * 86400,
+        path: "/api/transaction",
       });
-
-      console.log(a);
 
       return {
         message: dataRes,
+        token: auth.value,
         statusCode: STATUS_CODE.OK,
       };
     } catch (err: any) {
