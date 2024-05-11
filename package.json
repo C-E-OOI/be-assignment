@@ -10,11 +10,11 @@
     "migrate": "prisma migrate dev --name be-assignment"
   },
   "dependencies": {
+    "@elysiajs/jwt": "^1.0.2",
     "@elysiajs/swagger": "^1.0.5",
     "@prisma/client": "5.13.0",
     "bcrypt": "^5.1.1",
-    "elysia": "latest",
-    "supertokens-node": "^17.1.0"
+    "elysia": "latest"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
