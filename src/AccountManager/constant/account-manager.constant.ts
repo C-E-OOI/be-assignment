@@ -1,8 +1,9 @@
 export const INVALID_INPUT = "invalid input";
 export const NOT_FOUND = "Not Found";
+export const BAD_REQUEST = "Bad Request";
 export const SALT_ROUND = 10;
 
-export enum statusCode {
+export enum STATUS_CODE {
   OK = 200,
   CREATED = 201,
   NOT_FOUND = 404,

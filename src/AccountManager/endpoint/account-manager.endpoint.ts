@@ -2,7 +2,8 @@ import Elysia, { t } from "elysia";
 import { IAccountManagerCommand } from "../application/command/account-manager.interface";
 import { IAccountManagerQuery } from "../application/query/account-manager.interface";
 import { IAccountManagerEndpoint } from "./account-manager.interface";
-import { TInsert, TReqSignin, TReqSignup, TSigninRes } from "../constant/account-manager.type";
+import { TCustomSetElysia, TInsert, TReqSignin, TReqSignup, TSigninRes, TSignupRes } from "../constant/account-manager.type";
+import { STATUS_CODE } from "../constant/account-manager.constant";
 
 export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   private _TAG: string;
@@ -23,6 +24,16 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
           email: t.String({ minLength: 10, maxLength: 100 }),
           password: t.String({ minLength: 8, maxLength: 80 }),
         }),
+        afterHandle({ response, set }: { response: TSigninRes | any; set: TCustomSetElysia }) {
+          if (response.statusCode === 200) {
+            console.log(response);
+            set.cookie = { token: { value: response.message.token } };
+            set.status = response.statusCode;
+            return response.message;
+          }
+          set.status = STATUS_CODE.BAD_REQUEST;
+          return new Response(response);
+        },
       })
       .post("/signup", async ({ body }: { body: TReqSignup }) => await this.signup(body), {
         body: t.Object({
@@ -37,18 +48,20 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   async signin(req: TReqSignin): Promise<TSigninRes | undefined> {
     try {
       const { email, password } = req;
-
       const dataRes = await this._query.signin(email, password);
-      console.info(`${this._TAG} dataRes: ` + dataRes);
-      return dataRes;
+      console.info(`${this._TAG} dataRes: ${JSON.stringify(dataRes)}`);
+      return {
+        message: dataRes,
+        statusCode: STATUS_CODE.OK,
+      };
     } catch (err: any) {
       console.error(`${this._TAG} Got Error at func signin: ${err.message}`);
     }
   }
 
-  async signup(req: TReqSignup): Promise<string | undefined> {
+  async signup(req: TReqSignup): Promise<TSignupRes | undefined> {
     try {
-      const { name, role, email, password } = req as any;
+      const { name, role, email, password } = req;
       const dto: TInsert = {
         name: name,
         role: role,
@@ -57,9 +70,16 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       };
       const dataRes = await this._command.signup(dto);
       console.info(`${this._TAG} dataRes: ${dataRes}`);
-      return dataRes;
+      return {
+        message: dataRes,
+        statusCode: STATUS_CODE.OK,
+      };
     } catch (err: any) {
       console.error(`${this._TAG} Got Error at func signup: ${err.message}`);
+      return {
+        message: err.message,
+        statusCode: STATUS_CODE.INTERNAL_SERVER_ERROR,
+      };
     }
   }
 }

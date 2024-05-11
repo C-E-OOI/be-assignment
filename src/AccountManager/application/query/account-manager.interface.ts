@@ -1,5 +1,5 @@
-import { TSigninRes } from "@/AccountManager/constant/account-manager.type";
+import { TSigninResDb } from "@/AccountManager/constant/account-manager.type";
 
 export interface IAccountManagerQuery {
-  signin(email: string, password: string): Promise<TSigninRes>;
+  signin(email: string, password: string): Promise<TSigninResDb>;
 }
