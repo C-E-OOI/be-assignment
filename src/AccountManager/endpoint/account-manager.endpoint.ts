@@ -26,8 +26,8 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       })
       .post("/signup", async ({ body }: { body: TReqSignup }) => await this.signup(body), {
         body: t.Object({
-          username: t.String({ minLength: 10, maxLength: 50 }),
-          role: t.String({ minLength: 5, maxLength: 10 }),
+          name: t.String({ minLength: 10, maxLength: 50 }),
+          role: t.String({ minLength: 2, maxLength: 10 }),
           email: t.String({ minLength: 10, maxLength: 50 }),
           password: t.String({ minLength: 8, maxLength: 32 }),
         }),
