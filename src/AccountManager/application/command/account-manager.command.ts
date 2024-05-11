@@ -1,11 +1,14 @@
 import { IAccountManagerService } from "@/AccountManager/domain/account-manager.interface";
-import { IAccountManagerCommand } from "./account-manager.abstraction";
-import { TInsert } from "@/AccountManager/constant/account-manager.type";
+import { TInsert, TInsertToken } from "@/AccountManager/constant/account-manager.type";
+import { IAccountManagerCommand } from "./account-manager.interface";
 
 export class AccountManagerCommand implements IAccountManagerCommand {
   private _service;
   constructor(edtechService: IAccountManagerService) {
     this._service = edtechService;
+  }
+  async refreshToken(DTO: TInsertToken): Promise<void> {
+    await this._service.addToken(DTO);
   }
 
   private async validatePassword(password: string): Promise<boolean> {

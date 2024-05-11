@@ -4,8 +4,11 @@ import { IAccountManagerQuery } from "./account-manager.interface";
 
 export class AccountManagerQuery implements IAccountManagerQuery {
   private _service;
+  private _hasher;
+
   constructor(edtechService: IAccountManagerService) {
     this._service = edtechService;
+    this._hasher = Bun.password;
   }
 
   private _validateEmail = (param: string): boolean => {
@@ -22,14 +25,21 @@ export class AccountManagerQuery implements IAccountManagerQuery {
       return "Invalid Email";
     }
 
-    const user = await this._service.get(email);
-    if (!user) {
+    const existingUser = await this._service.get(email);
+    if (!existingUser) {
       return `User ${NOT_FOUND}`;
     }
 
+    const validPassword = await Bun.password.verify(password, existingUser.password);
+
+    if (!validPassword) {
+      return "Invalid Credentials";
+    }
+
     return {
-      email: user.email,
-      role: user.role,
+      id: existingUser.id,
+      email: existingUser.email,
+      role: existingUser.role,
     };
   }
 }

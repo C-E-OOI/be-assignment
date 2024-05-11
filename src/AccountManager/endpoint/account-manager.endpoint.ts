@@ -1,10 +1,18 @@
 import Elysia, { Cookie, t } from "elysia";
-import { IAccountManagerCommand } from "../application/command/account-manager.abstraction";
 import { IAccountManagerQuery } from "../application/query/account-manager.interface";
-import { IAccountManagerEndpoint, IJWT } from "./account-manager.interface";
-import { TCustomSetElysia, TInsert, TReqSignin, TReqSignup, TSigninRes, TSignupRes } from "../constant/account-manager.type";
+import { IAccountManagerEndpoint, IBasicAuth, IJWT, IJwtAccessSetup, IJwtRefreshToken } from "./account-manager.interface";
+import {
+  TCustomSetElysia,
+  TInsert,
+  TInsertToken,
+  TReqSignin,
+  TReqSignup,
+  TSigninRes,
+  TSignupRes,
+} from "../constant/account-manager.type";
 import { STATUS_CODE } from "../constant/account-manager.constant";
-import { JWTPayloadSpec } from "@elysiajs/jwt";
+import { randomUUID } from "crypto";
+import { IAccountManagerCommand } from "../application/command/account-manager.interface";
 
 export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   private _TAG: string;
@@ -19,56 +27,9 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
     query: IAccountManagerQuery,
     command: IAccountManagerCommand,
     router: Elysia<"/auth">,
-    basicAuthModel: Elysia<
-      "",
-      false,
-      { decorator: {}; store: {}; derive: {}; resolve: {} },
-      { type: { readonly basicAuthModel: { email: string; password: string } }; error: {} },
-      { schema: {}; macro: {} },
-      {},
-      { derive: {}; resolve: {}; schema: {} },
-      { derive: {}; resolve: {}; schema: {} }
-    >,
-    jwtAccessSetup: Elysia<
-      "",
-      false,
-      {
-        decorator: {
-          jwtAccess: {
-            readonly sign: (morePayload: { id: string } & JWTPayloadSpec) => Promise<string>;
-            readonly verify: (jwt?: string | undefined) => Promise<false | ({ id: string } & JWTPayloadSpec)>;
-          };
-        };
-        store: {};
-        derive: {};
-        resolve: {};
-      },
-      { type: {}; error: {} },
-      { schema: {}; macro: {} },
-      {},
-      { derive: {}; resolve: {}; schema: {} },
-      { derive: {}; resolve: {}; schema: {}; decorator: {}; store: {} }
-    >,
-    jwtRefreshSetup: Elysia<
-      "",
-      false,
-      {
-        decorator: {
-          jwtRefresh: {
-            readonly sign: (morePayload: { id: string } & JWTPayloadSpec) => Promise<string>;
-            readonly verify: (jwt?: string | undefined) => Promise<false | ({ id: string } & JWTPayloadSpec)>;
-          };
-        };
-        store: {};
-        derive: {};
-        resolve: {};
-      },
-      { type: {}; error: {} },
-      { schema: {}; macro: {} },
-      {},
-      { derive: {}; resolve: {}; schema: {} },
-      { derive: {}; resolve: {}; schema: {}; decorator: {}; store: {} }
-    >
+    basicAuthModel: IBasicAuth,
+    jwtAccessSetup: IJwtAccessSetup,
+    jwtRefreshSetup: IJwtRefreshToken
   ) {
     this._query = query;
     this._command = command;
@@ -88,14 +49,16 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       .post(
         "/signin",
         async ({
-          jwt,
+          jwtAccess,
+          jwtRefresh,
           cookie: { auth },
           body,
         }: {
-          jwt: Record<string, string | number> & IJWT;
+          jwtAccess: Record<string, string | number> & IJWT;
+          jwtRefresh: Record<string, string | number> & IJWT;
           cookie: { auth: Cookie<any> };
           body: TReqSignin;
-        }) => await this.signin(jwt, auth, body),
+        }) => await this.signin(jwtAccess, jwtRefresh, auth, body),
         {
           body: "basicAuthModel",
           afterHandle({ response, set }: { response: TSigninRes | any; set: TCustomSetElysia }) {
@@ -121,7 +84,8 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   }
 
   async signin(
-    jwt: Record<string, string | number> & IJWT,
+    jwtAccess: Record<string, string | number> & IJWT,
+    jwtRefresh: Record<string, string | number> & IJWT,
     auth: Cookie<any>,
     req: TReqSignin
   ): Promise<TSigninRes | undefined> {
@@ -130,8 +94,21 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       const dataRes = await this._query.signin(email, password);
       console.info(`${this._TAG} dataRes: ${JSON.stringify(dataRes)}`);
 
+      const refreshId = randomUUID();
+      const refreshToken = await jwtRefresh.sign({
+        id: refreshId,
+      });
+      const hashedToken = new Bun.CryptoHasher("sha512").update(refreshToken).digest("hex");
+      const dtoRefreshToken: TInsertToken = {
+        hashedToken: hashedToken,
+        id: refreshId,
+        userId: dataRes.id,
+      };
+      await this._command.refreshToken(dtoRefreshToken);
       auth.set({
-        value: await jwt.sign(req),
+        value: await jwtAccess.sign({
+          id: String(dataRes.id),
+        }),
         httpOnly: true,
         maxAge: 1 * 86400,
         path: "/api/transaction",

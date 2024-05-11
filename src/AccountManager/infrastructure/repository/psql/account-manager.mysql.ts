@@ -1,5 +1,5 @@
-import { TInsert, TRepositoryPrisma } from "@/AccountManager/constant/account-manager.type";
-import { IAccountManagerRepository } from "../account-manager.repository";
+import { TInsert, TInsertToken, TRepositoryPrisma } from "@/AccountManager/constant/account-manager.type";
+import { IAccountManagerRepository } from "../account-manager.repository.interface";
 
 export class AccountManagerRepository implements IAccountManagerRepository {
   private _TAG;
@@ -9,6 +9,21 @@ export class AccountManagerRepository implements IAccountManagerRepository {
     this._TAG = "AccountManagerRepository";
     this._prisma = prisma;
     this._hasher = Bun.password;
+  }
+
+  async insertToken(DTO: TInsertToken) {
+    try {
+      await this._prisma.refreshToken.create({
+        data: {
+          id: DTO.id,
+          userId: DTO.userId,
+          hashedToken: DTO.hashedToken,
+        },
+      });
+    } catch (error: any) {
+      console.error(`${this._TAG} Got Error at func: insertToken(): ${error.message}`);
+      throw new Error(`${this._TAG} Got Error at func: insertToken(): ${error.message}`);
+    }
   }
 
   async insert(DTO: TInsert): Promise<any> {

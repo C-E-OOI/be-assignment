@@ -1,11 +1,10 @@
-import { AccountManagerRepository } from "@/AccountManager/infrastructure/repository/psql/account-manager.mysql";
 import { basicAuthModel, jwtAccessSetup, jwtRefreshSetup, prismaConnection } from "./dependency-injection.init";
 import { AccountManagerService } from "@/AccountManager/domain/account-manager.service";
 import { AccountManagerQuery } from "@/AccountManager/application/query/account-manager.query";
 import { AccountManagerCommand } from "@/AccountManager/application/command/account-manager.command";
 import Elysia from "elysia";
 import { AccountManagerEndpoint } from "@/AccountManager/endpoint/account-manager.endpoint";
-import { ICustomElysia } from "@/AccountManager/endpoint/account-manager.interface";
+import { AccountManagerRepository } from "@/AccountManager/infrastructure/repository/psql/account-manager.mysql";
 
 class Application {
   private _repositoryUser;
