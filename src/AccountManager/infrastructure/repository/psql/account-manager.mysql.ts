@@ -1,4 +1,4 @@
-import { IAccountManagerRepository } from "../account-manager.repository";
+import { IAccountManagerRepository } from "../account-manager.repository.interface";
 import { TInsert, TRepositoryPrisma } from "@/AccountManager/constant/account-manager.type";
 import bcrypt from "bcrypt";
 import { SALT_ROUND } from "@/AccountManager/constant/account-manager.constant";

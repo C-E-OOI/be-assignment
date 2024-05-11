@@ -6,7 +6,7 @@ import { AccountManagerCommand } from "@/AccountManager/application/command/acco
 import Elysia from "elysia";
 import { AccountManagerEndpoint } from "@/AccountManager/endpoint/account-manager.endpoint";
 
-export class Application {
+class Application {
   private _repositoryUser;
   private _serviceUser;
   private _queryUser;
@@ -23,8 +23,10 @@ export class Application {
     this._endpointUser = new AccountManagerEndpoint(this._queryUser, this._commandUser, this._router);
   }
 
-  get endpointUser() {
-    // console.log(this._endpointUser)
+  get getEndpointUser() {
     return this._endpointUser;
   }
 }
+
+const App = new Application();
+export const endpointsUser = App.getEndpointUser.registerRoute();

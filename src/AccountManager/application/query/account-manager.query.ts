@@ -1,6 +1,6 @@
-import { IAccountManagerService } from "@/AccountManager/domain/account-manager.abstraction";
+import { IAccountManagerService } from "@/AccountManager/domain/account-manager.interface";
 import { INVALID_INPUT, NOT_FOUND } from "@/AccountManager/constant/account-manager.constant";
-import { IAccountManagerQuery } from "./account-manager.abstraction";
+import { IAccountManagerQuery } from "./account-manager.interface";
 
 export class AccountManagerQuery implements IAccountManagerQuery {
   private _service;
@@ -15,7 +15,7 @@ export class AccountManagerQuery implements IAccountManagerQuery {
 
   async signin(email: string, password: string): Promise<any> {
     if (!email || !password) {
-      return `Login - ${INVALID_INPUT}`;
+      return INVALID_INPUT;
     }
 
     if (!this._validateEmail(email)) {
@@ -24,10 +24,8 @@ export class AccountManagerQuery implements IAccountManagerQuery {
 
     const user = await this._service.get(email);
     if (!user) {
-      return `Login ${NOT_FOUND}`;
+      return `User ${NOT_FOUND}`;
     }
-
-
 
     return {
       token: Math.random().toString(36),

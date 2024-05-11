@@ -1,6 +1,6 @@
 import { TInsert } from "../constant/account-manager.type";
-import { IAccountManagerRepository } from "../infrastructure/repository/account-manager.repository";
-import { IAccountManagerService } from "./account-manager.abstraction";
+import { IAccountManagerRepository } from "../infrastructure/repository/account-manager.repository.interface";
+import { IAccountManagerService } from "./account-manager.interface";
 
 export class AccountManagerService implements IAccountManagerService {
   _repository: IAccountManagerRepository;

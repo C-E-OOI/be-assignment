@@ -1,5 +1,5 @@
-import { IAccountManagerService } from "@/AccountManager/domain/account-manager.abstraction";
-import { IAccountManagerCommand } from "./account-manager.abstraction";
+import { IAccountManagerService } from "@/AccountManager/domain/account-manager.interface";
+import { IAccountManagerCommand } from "./account-manager.interface";
 import { TInsert } from "@/AccountManager/constant/account-manager.type";
 
 export class AccountManagerCommand implements IAccountManagerCommand {

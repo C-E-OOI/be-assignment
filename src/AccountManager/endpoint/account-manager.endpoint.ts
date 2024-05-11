@@ -1,8 +1,8 @@
 import Elysia, { t } from "elysia";
-import { IAccountManagerCommand } from "../application/command/account-manager.abstraction";
-import { IAccountManagerQuery } from "../application/query/account-manager.abstraction";
-import { IAccountManagerEndpoint } from "./account-manager.abstraction";
-import { TInsert, TSigninRes } from "../constant/account-manager.type";
+import { IAccountManagerCommand } from "../application/command/account-manager.interface";
+import { IAccountManagerQuery } from "../application/query/account-manager.interface";
+import { IAccountManagerEndpoint } from "./account-manager.interface";
+import { TInsert, TReqSignin, TReqSignup, TSigninRes } from "../constant/account-manager.type";
 
 export class AccountManagerEndpoint implements IAccountManagerEndpoint {
   private _TAG: string;
@@ -16,15 +16,15 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
     this._TAG = "AccountManagerEndpoint";
   }
 
-  async registerRoute(): Promise<any> {
-    this._router
-      .get("/signin", async ({ body }: { body: Body }) => await this.signin(body), {
+  registerRoute(): any {
+    return this._router
+      .post("/signin", async ({ body }: { body: TReqSignin }) => await this.signin(body), {
         body: t.Object({
-          email: t.String({ minLength: 10, maxLength: 50 }),
-          password: t.String({ minLength: 8, maxLength: 32 }),
+          email: t.String({ minLength: 10, maxLength: 100 }),
+          password: t.String({ minLength: 8, maxLength: 80 }),
         }),
       })
-      .post("/signup", async ({ body }: { body: Body }) => await this.signup(body), {
+      .post("/signup", async ({ body }: { body: TReqSignup }) => await this.signup(body), {
         body: t.Object({
           username: t.String({ minLength: 10, maxLength: 50 }),
           role: t.String({ minLength: 5, maxLength: 10 }),
@@ -34,20 +34,21 @@ export class AccountManagerEndpoint implements IAccountManagerEndpoint {
       });
   }
 
-  async signin(req: Body): Promise<TSigninRes | undefined> {
+  async signin(req: TReqSignin): Promise<TSigninRes | undefined> {
     try {
-      const { email, password } = req.body as any;
+      const { email, password } = req;
+
       const dataRes = await this._query.signin(email, password);
-      console.info(`${this._TAG} dataRes: ${dataRes}`);
+      console.info(`${this._TAG} dataRes: ` + dataRes);
       return dataRes;
     } catch (err: any) {
       console.error(`${this._TAG} Got Error at func signin: ${err.message}`);
     }
   }
 
-  async signup(req: Body): Promise<string | undefined> {
+  async signup(req: TReqSignup): Promise<string | undefined> {
     try {
-      const { name, role, email, password } = req.body as any;
+      const { name, role, email, password } = req as any;
       const dto: TInsert = {
         name: name,
         role: role,
