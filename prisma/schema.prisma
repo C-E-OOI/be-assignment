@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model accounts {
+  id             Int    @id @default(autoincrement())
+  user_id        Int
+  account_number String @db.VarChar(100)
+  balance        Float
+  account_type   String @db.VarChar(10)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model transactions {
+  id                   Int      @id @default(autoincrement())
+  sof_number           String   @db.VarChar(100)
+  dof_number           String   @db.VarChar(100)
+  amount               Float
+  transaction_type     String   @db.VarChar(1)
+  account_id           Int
+  transaction_datetime DateTime @default(now())
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model users {
+  id        Int    @id @default(autoincrement())
+  full_name String @db.VarChar(255)
+  phone     String @db.VarChar(100)
+  username  String @db.VarChar(100)
+  password  String @db.VarChar(100)
+  salt      String @db.VarChar(100)
+  email     String @unique
+}
