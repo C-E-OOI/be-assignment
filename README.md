@@ -47,7 +47,7 @@ Features:
 
 ### Tech-stack:
 - Recommend using authentication 3rd party: Supertokens, Supabase...
-- `NodeJs` for API server (`Fastify/Gin` framework is the best choices)
+- `NodeJs` for API server (`Fastify` framework is the best choices)
 - `PostgreSQL/MongoDB` for Database. Recommend using `Prisma` for ORM.
 - `Docker` for containerization. Recommend using `docker-compose` for running containers.
  
