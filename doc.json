@@ -1,0 +1,192 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Account Manager API",
+        "description": "API for managing user accounts and transactions",
+        "version": "1.0.0"
+    },
+    "host": "localhost:3000",
+    "basePath": "/",
+    "schemes": [
+        "http"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "summary": "Register a new user",
+                "description": "Create a new user account",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "user",
+                        "description": "User details",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    },
+                    "400": {
+                        "description": "Error creating user"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "summary": "Login a user",
+                "description": "Authenticate a user",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "user",
+                        "description": "User credentials",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Logged in successfully"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/accounts": {
+            "get": {
+                "summary": "Get all accounts for a user",
+                "description": "Retrieve all accounts for a user",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "userId",
+                        "description": "User ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Accounts retrieved successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                }
+            }
+        },
+        "/accounts/{accountId}": {
+            "get": {
+                "summary": "Get account details",
+                "description": "Retrieve account details",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "accountId",
+                        "description": "Account ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account details retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Account not found"
+                    }
+                }
+            }
+        },
+        "/transactions": {
+            "post": {
+                "summary": "Create a new transaction",
+                "description": "Create a new transaction",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "transaction",
+                        "description": "Transaction details",
+                        "schema": {
+                            "$ref": "#/definitions/Transaction"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Transaction created successfully"
+                    },
+                    "400": {
+                        "description": "Error creating transaction"
+                    }
+                }
+            }
+        },
+        "/transactions/{transactionId}": {
+            "get": {
+                "summary": "Get transaction details",
+                "description": "Retrieve transaction details",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "transactionId",
+                        "description": "Transaction ID",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Transaction details retrieved successfully"
+                    },
+                    "404": {
+                        "description": "Transaction not found"
+                    }
+                }
+            }
+        },
+        "/recurring-payments": {
+            "post": {
+                "summary": "Create a new recurring payment",
+                "description": "Create a new recurring payment",
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "recurringPayment",
+                        "description": "Recurring payment details",
+                        "schema": {
+                            "$ref": "#/definitions/RecurringPayment"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Recurring payment created successfully"
+                    },
+                    "400": {
+                        "description": "Error creating recurring payment"
+                    }
+                }
+            }
+        },
+        "/recurring-payments/{recurringPaymentId}": {
+            "get": {
+                "summary": "Get recurring payment details",
+                "description": "Retrieve recurring payment"
+            }
+        }
+    }
+}
